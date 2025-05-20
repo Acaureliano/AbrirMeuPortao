@@ -1,9 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, Image, ImageBackground, Dimensions, StatusBar, } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, Image, ImageBackground, StatusBar, Dimensions, NativeScrollEvent, NativeSyntheticEvent, } from 'react-native';
 import { useRouter } from "expo-router";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FlatList } from 'react-native';
+
+
+const { width } = Dimensions.get('window');
+const ITEM_WIDTH = width * 0.5;
+const ITEM_MARGIN = width * 0.045;
+const SIDE_PADDING = (width - ITEM_WIDTH) / 2.5 - ITEM_MARGIN;
 
 const itemsImg = {
     headerLogo: require('../assets/images/logo.png'),
@@ -17,15 +23,10 @@ type controleType = {
     webHost: string;
 };
 
-const { width } = Dimensions.get('window');
-
 export default function HomePage() {
     const [listaControle, setListaControle] = useState<controleType[]>([]);
     const [viewColor, setViewColor] = useState('#552323');
     const router = useRouter();
-    const ITEM_WIDTH = width / 2;
-    const VISIBLE_PART = ITEM_WIDTH / 6;
-    const SIDE_PADDING = (width - ITEM_WIDTH) / 3;
 
     const handlePressIn = () => {
 		setViewColor('#ff0000'); // Cor da View quando o botão é pressionado
@@ -53,6 +54,32 @@ export default function HomePage() {
         loadControleList();
     }, []);
 
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const renderItem = ({ item }: { item: controleType }) => (
+        <ImageBackground style={styled.controle}  source={itemsImg.controle} resizeMode="stretch" >
+            <View style={styled.indicatorContainer}>
+                <View style={[styled.indicatorRed, {backgroundColor: viewColor,}]} />
+            </View>
+            <View style={styled.contButton}>
+                <TouchableOpacity style={styled.button} activeOpacity={0.8} onPressIn={handlePressIn} onPressOut={handlePressOut} >
+                    <ImageBackground style={styled.button} source={itemsImg.bt}>
+                        <MaterialIcons name="wifi-tethering" size={54} color="#231F20" />
+                    </ImageBackground>
+                </TouchableOpacity>
+            </View>
+            <Text style={styled.title}>
+                {item.nome}
+            </Text>
+        </ImageBackground>
+    );
+
+    const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+        const offsetX = event.nativeEvent.contentOffset.x;
+        const index = Math.round(offsetX / (ITEM_WIDTH + ITEM_MARGIN * 2));
+        setCurrentIndex(index);
+    };
+
     return (
         <View style={styled.container}>
             <StatusBar backgroundColor="#01244E"/>
@@ -63,33 +90,29 @@ export default function HomePage() {
                 <View style={styled.containerControle}>
                     <FlatList
                         data={listaControle}
-                        keyExtractor={(item) => item.id}
+                        renderItem={renderItem}
+                        keyExtractor={(_, index) => index.toString()}
                         horizontal
-                        pagingEnabled
-                        snapToInterval={ITEM_WIDTH + VISIBLE_PART * 2}
-                        decelerationRate="fast"
                         showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={{
-                            paddingHorizontal: SIDE_PADDING,
-                        }}
-                        renderItem={({ item }) => (
-                            <ImageBackground style={[styled.controle, { width: ITEM_WIDTH, marginHorizontal: VISIBLE_PART, }]}  source={itemsImg.controle}>
-                                <View style={styled.indicatorContainer}>
-                                    <View style={[styled.indicatorRed, {backgroundColor: viewColor,}]} />
-                                </View>
-                                <View style={styled.contButton}>
-                                    <TouchableOpacity style={styled.button} activeOpacity={0.8} onPressIn={handlePressIn} onPressOut={handlePressOut} >
-                                        <ImageBackground style={styled.button} source={itemsImg.bt}>
-                                            <MaterialIcons name="wifi-tethering" size={54} color="#231F20" />
-                                        </ImageBackground>
-                                    </TouchableOpacity>
-                                </View>
-                                <Text style={styled.title}>
-                                    {item.nome}
-                                </Text>
-                            </ImageBackground>
-                        )}
+                        snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 4}
+                        decelerationRate="fast"
+                        contentContainerStyle={{ paddingHorizontal: SIDE_PADDING + ITEM_MARGIN, }}
+                        ItemSeparatorComponent={() => <View style={{ width: ITEM_MARGIN * 2 }} />}
+                        onScroll={handleScroll}
+                        scrollEventThrottle={16}
+                        style={{height: ITEM_WIDTH * 1.55, }}
                     />
+                    <View style={styled.pagination}>
+                        {listaControle.map((_, index) => (
+                        <View
+                            key={index}
+                            style={[
+                            styled.dot,
+                            { opacity: currentIndex === index ? 1 : 0.3 },
+                            ]}
+                        />
+                        ))}
+                    </View>
                 </View>
             )}
             <View style={styled.footer}>
@@ -111,6 +134,7 @@ const styled = StyleSheet.create({
         flex: 1,
         /*position: 'relative',*/
         alignItems: 'center',
+        justifyContent: 'center',
         backgroundColor: '#021736',
     },
     header: {
@@ -128,10 +152,8 @@ const styled = StyleSheet.create({
         resizeMode: 'stretch',
     },
     containerControle: {
-        flexDirection: 'row',
         alignItems: 'center',
         width: width,
-        flex: 1,
     },
     animatedContainer: {
         flexDirection: 'row',
@@ -143,17 +165,23 @@ const styled = StyleSheet.create({
     controle: {
         justifyContent: 'space-between',
         alignItems: 'center',
-        height: 300,
-        width: width / 2,
-        /*backgroundColor: '#141414',*/
-        /*borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-        borderBottomLeftRadius: 100,
-        borderBottomRightRadius: 100,*/
+        height: ITEM_WIDTH * 1.55,
+        width: ITEM_WIDTH,
         paddingTop: 20,
         paddingBottom: 20,
-        marginHorizontal: width / 9,
-        resizeMode: 'cover',
+        marginHorizontal: ITEM_MARGIN,
+    },
+    pagination: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 30,
+    },
+    dot: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: '#797979FF',
+        marginHorizontal: 5,
     },
     title: {
         color: 'white',

@@ -45,9 +45,9 @@ export default function AddPage() {
         }
     };
     const handleDelete = async (id: string) => {
-        /*Alert.alert(
+        Alert.alert(
             'REMOVER',
-            'Tem certeza que deseja excluir a tarefa?',
+            'Tem certeza que deseja excluir o controle?',
             [
                 {
                     text: 'Não',
@@ -55,14 +55,14 @@ export default function AddPage() {
                 },
                 {
                     text: 'Sim',
-                    onPress: () => {*/
+                    onPress: () => {
                         // Chama uma função async de verdade
-                        confirmDelete(id);/*
+                        confirmDelete(id);
                     },
                 },
             ],
             { cancelable: false },
-        );*/
+        );
     };
 
     const confirmDelete = async (id: string) => {
@@ -96,7 +96,7 @@ export default function AddPage() {
                 const storedNameValue = await AsyncStorage.getItem('lastNameValue');
                 const storedWebHostValue = await AsyncStorage.getItem('lastWebHostValue');
                 if (!storedNameValue && !storedWebHostValue) {
-                    router.back();
+                    router.push('/');
                 } else {
                     Alert.alert('ATENÇÃO!', 'Adicione o controle para portão!');
                 }
