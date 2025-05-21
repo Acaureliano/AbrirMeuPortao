@@ -135,7 +135,7 @@ export default function AddPage() {
                         <MaterialCommunityIcons name="speaker-off" size={64} color="white" style={{marginTop: 20}} />
                         <Text style={styled.title3}>
                             Lista vazia!{'\n'}
-                            Você ainda não tem um portão cadastrado.
+                            Você ainda não tem um controle cadastrado.
                         </Text>
                     </View>
                 ) : (
@@ -229,12 +229,12 @@ const styled = StyleSheet.create({
     title3: {
         flex: 1,
         color: 'white',
-        fontSize: 14,
-        lineHeight: 19.6,
+        fontSize: 18,
+        lineHeight: 30,
         textAlign: 'center',
         fontWeight: '400',
         top: 12,
-      },
+    },
     listItem: {
         flexDirection: 'row',
         justifyContent: 'space-between',

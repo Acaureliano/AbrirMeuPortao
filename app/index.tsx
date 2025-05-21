@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, Image, ImageBackground, StatusBar, Dimensions, NativeScrollEvent, NativeSyntheticEvent, } from 'react-native';
 import { useRouter } from "expo-router";
-import { MaterialIcons, Ionicons } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FlatList } from 'react-native';
 
@@ -86,8 +86,17 @@ export default function HomePage() {
             <View style={styled.header}>
                 <Image style={styled.logo} source={itemsImg.headerLogo}/>
             </View>
-            {listaControle.length > 0 && (
-                <View style={styled.containerControle}>
+            {listaControle.length === 0 ? (
+                <View style={[styled.containerControle1, {alignItems: 'center', justifyContent: 'center', position: 'absolute', paddingHorizontal: 20, }]}>
+                    <MaterialCommunityIcons name="speaker-off" size={64} color="white" style={{marginTop: 20}} />
+                    <Text style={[styled.title3, {top: 0}]}>
+                        Não há controles salvos.{'\n'}
+                        Clique no botão <Ionicons name="add-circle-sharp" size={20} color="#ffc800" /> para{'\n'}
+                        adicionar um controle!
+                    </Text>
+                </View>
+            ) : (
+                <View style={styled.containerControle2}>
                     <FlatList
                         data={listaControle}
                         renderItem={renderItem}
@@ -151,7 +160,13 @@ const styled = StyleSheet.create({
         width: 142,
         resizeMode: 'stretch',
     },
-    containerControle: {
+    containerControle1: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'absolute', 
+        width: width,
+    },
+    containerControle2: {
         alignItems: 'center',
         width: width,
     },
@@ -161,6 +176,15 @@ const styled = StyleSheet.create({
     arrowButton: {
         padding: 10,
         zIndex: 1,
+    },
+    title3: {
+        flex: 1,
+        color: 'white',
+        fontSize: 18,
+        lineHeight: 30,
+        textAlign: 'center',
+        fontWeight: '400',
+        top: 12,
     },
     controle: {
         justifyContent: 'space-between',
