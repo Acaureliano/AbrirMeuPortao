@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Platform, Text, View, StyleSheet, TouchableOpacity, Image, ImageBackground, StatusBar, Dimensions, NativeScrollEvent, NativeSyntheticEvent, } from 'react-native';
-import { useRouter } from "expo-router";
-import { MaterialIcons, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { FlatList } from 'react-native';
+import { useRouter } from "expo-router";
+import React, { useEffect, useState } from 'react';
+import { Dimensions, FlatList, Image, ImageBackground, NativeScrollEvent, NativeSyntheticEvent, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 
 const { width } = Dimensions.get('window');
