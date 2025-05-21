@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, Image, ImageBackground, StatusBar, Dimensions, NativeScrollEvent, NativeSyntheticEvent, } from 'react-native';
+import { Platform, Text, View, StyleSheet, TouchableOpacity, Image, ImageBackground, StatusBar, Dimensions, NativeScrollEvent, NativeSyntheticEvent, } from 'react-native';
 import { useRouter } from "expo-router";
 import { MaterialIcons, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,6 +14,7 @@ const SIDE_PADDING = (width - ITEM_WIDTH) / 2.5 - ITEM_MARGIN;
 const itemsImg = {
     headerLogo: require('../assets/images/logo.png'),
     controle: require('../assets/images/controle.png'),
+    controleshadow: require('../assets/images/controleShadow.png'),
     bt: require('../assets/images/bt.png'),
 }
 
@@ -57,20 +58,22 @@ export default function HomePage() {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     const renderItem = ({ item }: { item: controleType }) => (
-        <ImageBackground style={styled.controle}  source={itemsImg.controle} resizeMode="stretch" >
-            <View style={styled.indicatorContainer}>
-                <View style={[styled.indicatorRed, {backgroundColor: viewColor,}]} />
-            </View>
-            <View style={styled.contButton}>
-                <TouchableOpacity style={styled.button} activeOpacity={0.8} onPressIn={handlePressIn} onPressOut={handlePressOut} >
-                    <ImageBackground style={styled.button} source={itemsImg.bt}>
-                        <MaterialIcons name="wifi-tethering" size={54} color="#231F20" />
-                    </ImageBackground>
-                </TouchableOpacity>
-            </View>
-            <Text style={styled.title}>
-                {item.nome}
-            </Text>
+        <ImageBackground style={styled.controleShadow}  source={itemsImg.controleshadow} resizeMode="stretch">
+            <ImageBackground style={styled.controle}  source={itemsImg.controle} resizeMode="stretch" >
+                <View style={styled.indicatorContainer}>
+                    <View style={[styled.indicatorRed, {backgroundColor: viewColor,}]} />
+                </View>
+                <View style={styled.contButton}>
+                    <TouchableOpacity style={styled.button} activeOpacity={0.8} onPressIn={handlePressIn} onPressOut={handlePressOut} >
+                        <ImageBackground style={styled.button} source={itemsImg.bt}>
+                            <MaterialIcons name="wifi-tethering" size={54} color="#231F20" />
+                        </ImageBackground>
+                    </TouchableOpacity>
+                </View>
+                <Text style={styled.title}>
+                    {item.nome}
+                </Text>
+            </ImageBackground>
         </ImageBackground>
     );
 
@@ -109,7 +112,7 @@ export default function HomePage() {
                         ItemSeparatorComponent={() => <View style={{ width: ITEM_MARGIN * 2 }} />}
                         onScroll={handleScroll}
                         scrollEventThrottle={16}
-                        style={{height: ITEM_WIDTH * 1.55, }}
+                        style={{height: ITEM_WIDTH * 1.7, }}
                     />
                     <View style={styled.pagination}>
                         {listaControle.map((_, index) => (
@@ -185,6 +188,14 @@ const styled = StyleSheet.create({
         textAlign: 'center',
         fontWeight: '400',
         top: 12,
+    },
+    controleShadow: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: ITEM_WIDTH * 1.75,
+        width: ITEM_WIDTH * 1.3,
+        marginHorizontal: - 10,
+        paddingBottom: 9,
     },
     controle: {
         justifyContent: 'space-between',
